@@ -18,13 +18,13 @@
   "author": "Yamill Vallecillo <yamill@gmail.com> (github.com/yamill)",
   "contributors": [
     {
-      "name" : "André Neves",
-      "email" : "@andrerfneves",
-      "url" : "https://andrenev.es"
+      "name": "André Neves",
+      "email": "@andrerfneves",
+      "url": "https://andrenev.es"
     },
     {
-      "name" : "Aleksi Pousar",
-      "email" : "aleksi1578@msn.com"
+      "name": "Aleksi Pousar",
+      "email": "aleksi1578@msn.com"
     }
   ],
   "license": "ISC",
