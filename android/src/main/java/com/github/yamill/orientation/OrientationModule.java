@@ -38,7 +38,7 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
             @Override
             public void onReceive(Context context, Intent intent) {
                 Configuration newConfig = intent.getParcelableExtra("newConfig");
-                Log.d("OrientationModule", "Activity orientation: " + newConfig.orientation);
+                FLog.d(ReactConstants.TAG, "Activity orientation: " + newConfig.orientation);
 
                 WritableMap params = Arguments.createMap();
                 params.putString("orientation", OrientationModule.this.getOrientationString(newConfig.orientation));
@@ -53,7 +53,7 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
             public void onOrientationChanged(int orientation) {
                 String orientationStr = OrientationModule.this.getDeviceOrientationString(orientation);
                 if (!orientationStr.equals(mDeviceOrientationStr)) {
-                    Log.d("OrientationModule", "Device orientation: " + orientationStr);
+                    FLog.d(ReactConstants.TAG, "Device orientation: " + orientationStr);
                     mDeviceOrientationStr = orientationStr;
 
                     WritableMap params = Arguments.createMap();
