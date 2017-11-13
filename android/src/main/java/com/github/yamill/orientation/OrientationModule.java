@@ -51,10 +51,9 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
         mDeviceOrientationListener = new OrientationEventListener(getReactApplicationContext()) {
             @Override
             public void onOrientationChanged(int orientation) {
-                String orientationStr = OrientationModule.this.getDeviceOrientationString(orientation);
-                if (!orientationStr.equals(mDeviceOrientationStr)) {
-                    FLog.d(ReactConstants.TAG, "Device orientation: " + orientationStr);
-                    mDeviceOrientationStr = orientationStr;
+                if (!OrientationModule.this.isDeviceOrientationUnchanged(orientation)) {
+                    mDeviceOrientationStr = OrientationModule.this.getDeviceOrientationString(orientation);
+                    FLog.d(ReactConstants.TAG, "Device orientation: " + mDeviceOrientationStr);
 
                     WritableMap params = Arguments.createMap();
                     params.putString("orientation", mDeviceOrientationStr);
@@ -164,6 +163,24 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
             return "LANDSCAPE-LEFT";
         } else {
             return "PORTRAIT";
+        }
+    }
+
+    private boolean isDeviceOrientationUnchanged(int orientation) {
+        if (orientation < 0) {
+            return mDeviceOrientationStr.equals("UNKNOWN");
+        }
+
+        if (mDeviceOrientationStr.equals("PORTRAIT")) {
+            return orientation <= 60 || orientation >= 300;
+        } else if (mDeviceOrientationStr.equals("PORTRAIT-UPSIDEDOWN")) {
+            return orientation >= 120 && orientation <= 240;
+        } else if (mDeviceOrientationStr.equals("LANDSCAPE-LEFT")) {
+            return orientation >= 210 && orientation <= 330;
+        } else if (mDeviceOrientationStr.equals("LANDSCAPE-RIGHT")) {
+            return orientation >= 30 && orientation <= 150;
+        } else { // "UNKNOWN"
+            return orientation < 0;
         }
     }
 
