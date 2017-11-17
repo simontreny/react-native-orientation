@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.OrientationEventListener;
+import android.view.Surface;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -38,10 +39,11 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
             @Override
             public void onReceive(Context context, Intent intent) {
                 Configuration newConfig = intent.getParcelableExtra("newConfig");
-                FLog.d(ReactConstants.TAG, "Activity orientation: " + newConfig.orientation);
+                int rotation = intent.getIntExtra("rotation", 0);
+                FLog.d(ReactConstants.TAG, "Activity orientation: " + newConfig.orientation + ", " + rotation);
 
                 WritableMap params = Arguments.createMap();
-                params.putString("orientation", OrientationModule.this.getOrientationString(newConfig.orientation));
+                params.putString("orientation", OrientationModule.this.getOrientationString(newConfig.orientation, rotation));
                 reactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit("orientationDidChange", params);
@@ -74,9 +76,9 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
 
     @ReactMethod
     public void getOrientation(Callback callback) {
-        int orientationInt = getReactApplicationContext().getResources().getConfiguration().orientation;
-        String orientation = this.getOrientationString(orientationInt);
-        callback.invoke(orientation);
+        int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
+        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
+        callback.invoke(this.getOrientationString(orientation, rotation));
     }
 
     @ReactMethod
@@ -133,18 +135,18 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
     public @Nullable Map<String, Object> getConstants() {
         HashMap<String, Object> constants = new HashMap<String, Object>();
 
-        int orientationInt = getReactApplicationContext().getResources().getConfiguration().orientation;
-        String orientation = this.getOrientationString(orientationInt);
-        constants.put("initialOrientation", orientation);
+        int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
+        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
+        constants.put("initialOrientation", this.getOrientationString(orientation, rotation));
 
         return constants;
     }
 
-    private String getOrientationString(int orientation) {
+    private String getOrientationString(int orientation, int rotation) {
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return "LANDSCAPE";
+            return (rotation == Surface.ROTATION_90) ? "LANDSCAPE-LEFT" : "LANDSCAPE-RIGHT";
         } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            return "PORTRAIT";
+            return (rotation == Surface.ROTATION_0) ? "PORTRAIT" : "PORTRAIT-UPSIDEDOWN";
         } else {
             return "UNKNOWN";
         }

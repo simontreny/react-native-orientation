@@ -37,8 +37,8 @@ static UIInterfaceOrientationMask _orientation = UIInterfaceOrientationMaskAllBu
 - (void)deviceOrientationDidChange:(NSNotification *)notification
 {
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  NSString *orientationStr = [self getOrientationStr:orientation];
-  NSString *deviceOrientationStr = [self getDeviceOrientationStr:orientation];
+  NSString *orientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:YES];
+  NSString *deviceOrientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:NO];
 
   [self.bridge.eventDispatcher sendDeviceEventWithName:@"orientationDidChange"
                                               body:@{@"orientation": orientationStr}];
@@ -46,34 +46,7 @@ static UIInterfaceOrientationMask _orientation = UIInterfaceOrientationMaskAllBu
                                               body:@{@"orientation": deviceOrientationStr}];
 }
 
-- (NSString *)getOrientationStr:(UIDeviceOrientation)orientation {
-  switch (orientation) {
-    case UIDeviceOrientationPortrait:
-    case UIDeviceOrientationPortraitUpsideDown:
-      return @"PORTRAIT";
-
-    case UIDeviceOrientationLandscapeLeft:
-    case UIDeviceOrientationLandscapeRight:
-      return @"LANDSCAPE";
-
-    default:
-      // orientation is unknown, we try to get the status bar orientation
-      switch ([[UIApplication sharedApplication] statusBarOrientation]) {
-        case UIInterfaceOrientationPortrait:
-        case UIInterfaceOrientationPortraitUpsideDown:
-          return @"PORTRAIT";
-
-        case UIDeviceOrientationLandscapeLeft:
-        case UIDeviceOrientationLandscapeRight:
-          return @"LANDSCAPE";
-
-        default:
-          return @"UNKNOWN";
-      }
-  }
-}
-
-- (NSString *)getDeviceOrientationStr:(UIDeviceOrientation)orientation {
+- (NSString *)getDeviceOrientationStr:(UIDeviceOrientation)orientation fallbackToStatusBarOrientation:(BOOL)fallbackToStatusBar {
   switch (orientation) {
     case UIDeviceOrientationPortrait:
       return @"PORTRAIT";
@@ -88,8 +61,31 @@ static UIInterfaceOrientationMask _orientation = UIInterfaceOrientationMaskAllBu
       return @"LANDSCAPE-RIGHT";
 
     default:
-      return @"UNKNOWN";
+      if (fallbackToStatusBar) {
+        return [self getInterfaceOrientationStr:[[UIApplication sharedApplication] statusBarOrientation]];
+      } else {
+        return @"UNKNOWN";
+      }
   }
+}
+
+- (NSString *)getInterfaceOrientationStr:(UIInterfaceOrientation)orientation {
+    switch (orientation) {
+        case UIInterfaceOrientationPortrait:
+            return @"PORTRAIT";
+            
+        case UIInterfaceOrientationPortraitUpsideDown:
+            return @"PORTRAIT-UPSIDEDOWN";
+            
+        case UIInterfaceOrientationLandscapeLeft:
+            return @"LANDSCAPE-LEFT";
+            
+        case UIInterfaceOrientationLandscapeRight:
+            return @"LANDSCAPE-RIGHT";
+            
+        default:
+            return @"UNKNOWN";
+    }
 }
 
 RCT_EXPORT_MODULE();
@@ -97,14 +93,14 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(getOrientation:(RCTResponseSenderBlock)callback)
 {
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  NSString *orientationStr = [self getOrientationStr:orientation];
+  NSString *orientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:YES];
   callback(@[orientationStr]);
 }
 
 RCT_EXPORT_METHOD(getDeviceOrientation:(RCTResponseSenderBlock)callback)
 {
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  NSString *orientationStr = [self getDeviceOrientationStr:orientation];
+    NSString *orientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:NO];
   callback(@[orientationStr]);
 }
 
@@ -126,7 +122,7 @@ RCT_EXPORT_METHOD(lockToLandscape)
     NSLog(@"Locked to Landscape");
   #endif
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  NSString *orientationStr = [self getDeviceOrientationStr:orientation];
+  NSString *orientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:YES];
   if ([orientationStr isEqualToString:@"LANDSCAPE-LEFT"]) {
     [Orientation setOrientation:UIInterfaceOrientationMaskLandscape];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
@@ -176,7 +172,7 @@ RCT_EXPORT_METHOD(unlockAllOrientations)
 {
 
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  NSString *orientationStr = [self getOrientationStr:orientation];
+  NSString *orientationStr = [self getDeviceOrientationStr:orientation fallbackToStatusBarOrientation:YES];
 
   return @{
     @"initialOrientation": orientationStr

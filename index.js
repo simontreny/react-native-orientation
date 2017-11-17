@@ -84,5 +84,13 @@ module.exports = {
 
   getInitialOrientation() {
     return Orientation.initialOrientation;
+  },
+
+  isPortrait(orientation) {
+    return orientation === "PORTRAIT" || orientation == "PORTRAIT-UPSIDEDOWN"
+  },
+
+  isLandscape(orientation) {
+    return orientation === "LANDSCAPE-LEFT" || orientation == "LANDSCAPE-RIGHT"
   }
 }

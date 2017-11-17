@@ -4,14 +4,12 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 declare namespace Orientation {
-    type Orientation = "LANDSCAPE" | "PORTRAIT" | "UNKNOWN";
-    type DeviceOrientation = "PORTRAIT" | "PORTRAIT-UPSIDEDOWN" | "UNKNOWN" | "LANDSCAPE-LEFT" | "LANDSCAPE-RIGHT";
+    type Orientation = "PORTRAIT" | "PORTRAIT-UPSIDEDOWN" | "LANDSCAPE-LEFT" | "LANDSCAPE-RIGHT" | "UNKNOWN";
     type OrientationCallback = (orientation: Orientation) => void;
-    type DeviceOrientationCallback = (orientation: DeviceOrientation) => void;
 
     export function addOrientationListener(callback: OrientationCallback): void;
-    export function addDeviceOrientationListener(callback: DeviceOrientationCallback): void;
-    export function removeListener(callback: OrientationCallback | DeviceOrientationCallback): void;
+    export function addDeviceOrientationListener(callback: OrientationCallback): void;
+    export function removeListener(callback: OrientationCallback): void;
 
     export function getInitialOrientation(): Orientation;
     export function lockToPortrait(): void;
@@ -20,7 +18,10 @@ declare namespace Orientation {
     export function lockToLandscapeRight(): void;
     export function unlockAllOrientations(): void;
     export function getOrientation(callback: OrientationCallback): void;
-    export function getDeviceOrientation(callback: DeviceOrientationCallback): void;
+    export function getDeviceOrientation(callback: OrientationCallback): void;
+
+    export function isPortrait(orientation: Orientation): boolean;
+    export function isLandscape(orientation: Orientation): boolean;
 }
 
 export = Orientation;
