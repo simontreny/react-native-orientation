@@ -11,6 +11,6 @@
 #endif
 
 @interface Orientation : NSObject <RCTBridgeModule>
-+ (void)setOrientation: (UIInterfaceOrientationMask)orientation;
-+ (UIInterfaceOrientationMask)getOrientation;
++ (void)setSupportedOrientations:(UIInterfaceOrientationMask)orientationMask;
++ (UIInterfaceOrientationMask)getSupportedOrientations;
 @end

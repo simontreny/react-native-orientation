@@ -2,7 +2,7 @@ var Orientation = require('react-native').NativeModules.Orientation;
 var DeviceEventEmitter = require('react-native').DeviceEventEmitter;
 
 var listeners = {};
-var orientationDidChangeEvent = 'orientationDidChange';
+var interfaceOrientationDidChangeEvent = 'interfaceOrientationDidChange';
 var deviceOrientationDidChangeEvent = 'deviceOrientationDidChange';
 
 var id = 0;
@@ -23,8 +23,8 @@ function getKey(listener) {
 };
 
 module.exports = {
-  getOrientation(cb) {
-    Orientation.getOrientation((orientation) =>{
+  getInterfaceOrientation(cb) {
+    Orientation.getInterfaceOrientation((orientation) =>{
       cb(orientation);
     });
   },
@@ -55,9 +55,9 @@ module.exports = {
     Orientation.unlockAllOrientations();
   },
 
-  addOrientationListener(cb) {
+  addInterfaceOrientationListener(cb) {
     var key = getKey(cb);
-    listeners[key] = DeviceEventEmitter.addListener(orientationDidChangeEvent,
+    listeners[key] = DeviceEventEmitter.addListener(interfaceOrientationDidChangeEvent,
       (body) => {
         cb(body.orientation);
       });
@@ -82,8 +82,12 @@ module.exports = {
     listeners[key] = null;
   },
 
-  getInitialOrientation() {
-    return Orientation.initialOrientation;
+  getInitialInterfaceOrientation() {
+    return Orientation.initialInterfaceOrientation;
+  },
+
+  getInitialDeviceOrientation() {
+    return Orientation.initialDeviceOrientation;
   },
 
   isPortrait(orientation) {

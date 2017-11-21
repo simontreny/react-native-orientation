@@ -7,17 +7,18 @@ declare namespace Orientation {
     type Orientation = "PORTRAIT" | "PORTRAIT-UPSIDEDOWN" | "LANDSCAPE-LEFT" | "LANDSCAPE-RIGHT" | "UNKNOWN";
     type OrientationCallback = (orientation: Orientation) => void;
 
-    export function addOrientationListener(callback: OrientationCallback): void;
+    export function addInterfaceOrientationListener(callback: OrientationCallback): void;
     export function addDeviceOrientationListener(callback: OrientationCallback): void;
     export function removeListener(callback: OrientationCallback): void;
 
-    export function getInitialOrientation(): Orientation;
+    export function getInitialInterfaceOrientation(): Orientation;
+    export function getInitialDeviceOrientation(): Orientation;
     export function lockToPortrait(): void;
     export function lockToLandscape(): void;
     export function lockToLandscapeLeft(): void;
     export function lockToLandscapeRight(): void;
     export function unlockAllOrientations(): void;
-    export function getOrientation(callback: OrientationCallback): void;
+    export function getInterfaceOrientation(callback: OrientationCallback): void;
     export function getDeviceOrientation(callback: OrientationCallback): void;
 
     export function isPortrait(orientation: Orientation): boolean;

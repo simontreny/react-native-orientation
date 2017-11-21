@@ -46,7 +46,7 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
                 params.putString("orientation", OrientationModule.this.getOrientationString(newConfig.orientation, rotation));
                 reactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("orientationDidChange", params);
+                    .emit("interfaceOrientationDidChange", params);
             }
         };
 
@@ -75,10 +75,8 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
     }
 
     @ReactMethod
-    public void getOrientation(Callback callback) {
-        int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
-        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
-        callback.invoke(this.getOrientationString(orientation, rotation));
+    public void getInterfaceOrientation(Callback callback) {
+        callback.invoke(this.getInterfaceOrientationString());
     }
 
     @ReactMethod
@@ -135,11 +133,17 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
     public @Nullable Map<String, Object> getConstants() {
         HashMap<String, Object> constants = new HashMap<String, Object>();
 
-        int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
-        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
-        constants.put("initialOrientation", this.getOrientationString(orientation, rotation));
+        String orientation = this.getInterfaceOrientationString();
+        constants.put("initialInterfaceOrientation", orientation);
+        constants.put("initialDeviceOrientation", orientation);
 
         return constants;
+    }
+
+    private String getInterfaceOrientationString() {
+        int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
+        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
+        return getOrientationString(orientation, rotation);
     }
 
     private String getOrientationString(int orientation, int rotation) {
