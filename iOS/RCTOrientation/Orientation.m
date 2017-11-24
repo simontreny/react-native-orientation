@@ -136,10 +136,10 @@ RCT_EXPORT_METHOD(lockToLandscape)
   #endif
   [Orientation setSupportedOrientations:UIInterfaceOrientationMaskLandscape];
   [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
-    if (_deviceOrientation == UIDeviceOrientationLandscapeLeft) {
-      [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
-    } else {
+    if (_deviceOrientation == UIDeviceOrientationLandscapeRight) {
       [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIDeviceOrientationLandscapeRight] forKey:@"orientation"];
+    } else {
+      [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
     }
   }];
 }
