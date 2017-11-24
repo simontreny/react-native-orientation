@@ -12,6 +12,7 @@
 @interface Orientation () {
   UIInterfaceOrientation _interfaceOrientation;
   UIDeviceOrientation _deviceOrientation;
+  NSTimer* _timer;
 }
 @end
 
@@ -38,10 +39,13 @@ static UIInterfaceOrientationMask _orientationMask = UIInterfaceOrientationMaskA
   if ((self = [super init])) {
     _interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     _deviceOrientation = [[UIDevice currentDevice] orientation];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startObservingOrientationChanges) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopObservingOrientationChanges) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    [self startObservingOrientationChanges];
   }
   return self;
-
 }
 
 - (void)dealloc
@@ -49,15 +53,33 @@ static UIInterfaceOrientationMask _orientationMask = UIInterfaceOrientationMaskA
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)deviceOrientationDidChange:(NSNotification *)notification
-{
-  _interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-  _deviceOrientation = [[UIDevice currentDevice] orientation];
+- (void)startObservingOrientationChanges {
+  if (_timer == nil) {
+    _timer = [NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(checkOrientationChanges) userInfo:nil repeats:YES];
+  }
+}
 
-  [self.bridge.eventDispatcher sendDeviceEventWithName:@"interfaceOrientationDidChange"
-                                              body:@{@"orientation": [self getInterfaceOrientationStr]}];
-  [self.bridge.eventDispatcher sendDeviceEventWithName:@"deviceOrientationDidChange"
-                                                  body:@{@"orientation": [self getDeviceOrientationStr]}];
+- (void)stopObservingOrientationChanges {
+  if (_timer != nil) {
+    [_timer invalidate];
+    _timer = nil;
+  }
+}
+
+- (void)checkOrientationChanges {
+  UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+  if (deviceOrientation != _deviceOrientation) {
+    _deviceOrientation = deviceOrientation;
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"deviceOrientationDidChange"
+                                                    body:@{@"orientation": [self getDeviceOrientationStr]}];
+  }
+  
+  UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+  if (interfaceOrientation != _interfaceOrientation) {
+    _interfaceOrientation = interfaceOrientation;
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"interfaceOrientationDidChange"
+                                                    body:@{@"orientation": [self getInterfaceOrientationStr]}];
+  }
 }
 
 - (NSString *)getInterfaceOrientationStr {
