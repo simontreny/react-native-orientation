@@ -142,7 +142,8 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
 
     private String getInterfaceOrientationString() {
         int orientation = getReactApplicationContext().getResources().getConfiguration().orientation;
-        int rotation = getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
+        WindowManager windowManager = (WindowManager) getReactApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        int rotation = windowManager.getDefaultDisplay().getRotation();
         return getOrientationString(orientation, rotation);
     }
 
